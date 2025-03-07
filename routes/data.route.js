@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post("/create", upload.array("images", 10), createData);
 
-router.get("/get/all", getAllData);
+router.get("/admin/all", getAllData);
 
 router.get("/bidang/:bidang", getDataByBidang);
 
