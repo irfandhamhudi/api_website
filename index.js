@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://localhost:5175",
   "https://rebranding-web-kel-tlogosari-wetan-klien.vercel.app",
 ];
