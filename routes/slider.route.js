@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/create", upload.array("images", 10), uploadSlider);
 
 // Get all slider
-router.get("/all", getAllSlider);
+router.get("/get/all", getAllSlider);
 
 // Edit slider
 router.patch("/edit/:id", upload.array("images", 10), editSlider);
