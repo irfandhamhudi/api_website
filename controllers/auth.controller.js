@@ -14,7 +14,7 @@ export const registerUser = async (req, res) => {
     if (userExists) {
       return res
         .status(400)
-        .json({ success: false, message: "Email Already Exists." });
+        .json({ success: false, message: "Email sudah terdaftar." });
     }
 
     // Generate OTP
@@ -39,15 +39,12 @@ export const registerUser = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message:
-        "Registration successful. Please check your email to get the OTP.",
+      message: "Berhasil mendaftar. Silakan cek email Anda untuk verifikasi.",
       userId: user._id,
     });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to register user." });
+    res.status(500).json({ success: false, message: "Gagal mendaftar." });
   }
 };
 
@@ -69,10 +66,10 @@ export const verifyOtp = async (req, res) => {
     res.status(200).json({
       success: true,
       data: userData,
-      message: "OTP verified successfully",
+      message: "Berhasil verifikasi OTP",
     });
   } else {
-    res.status(400).json({ success: false, message: "Invalid OTP" });
+    res.status(400).json({ success: false, message: "OTP salah" });
   }
 };
 
@@ -82,7 +79,9 @@ export const getAllUsers = async (req, res) => {
     const users = await User.find();
     res.status(200).json({ success: true, data: users });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch users." });
+    res
+      .status(500)
+      .json({ success: false, message: "Gagal mendapatkan data pengguna." });
   }
 };
 
@@ -93,13 +92,15 @@ export const resendOtp = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(404).json({ success: false, message: "User not found" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Pengguna tidak ditemukan" });
   }
 
   if (user.isVerified) {
     return res
       .status(400)
-      .json({ success: false, message: "Account is already verified" });
+      .json({ success: false, message: "Pengguna sudah terverifikasi" });
   }
 
   // Generate OTP baru
@@ -117,10 +118,10 @@ export const resendOtp = async (req, res) => {
     await sendEmail(user.email, subject, message, user.username);
     res
       .status(200)
-      .json({ success: true, message: "New OTP sent successfully" });
+      .json({ success: true, message: "OTP berhasil dikirim ulang" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Failed to send new OTP" });
+    res.status(500).json({ success: false, message: "Gagal mengirim OTP" });
   }
 };
 
@@ -133,7 +134,7 @@ export const loginUser = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required" });
+        .json({ success: false, message: "Email dan password harus diisi" });
     }
 
     // Cek apakah email terdaftar
@@ -141,7 +142,7 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: "Email tidak ditemukan" });
     }
 
     // Verifikasi password
@@ -149,14 +150,14 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+        .json({ success: false, message: "Password/Email salah" });
     }
 
     // Periksa apakah pengguna sudah diverifikasi
     if (!user.isVerified) {
       return res
         .status(401)
-        .json({ success: false, message: "User not verified" });
+        .json({ success: false, message: "Akun belum diverifikasi" });
     }
 
     // Buat JWT token
@@ -174,7 +175,7 @@ export const loginUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: "Login berhasil",
     });
   } catch (error) {
     res
@@ -190,14 +191,15 @@ export const getMe = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
     }
     res.status(200).json({ success: true, data: user });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to retrieve user data" });
+    res.status(500).json({
+      success: false,
+      message: "Gagal mendapatkan informasi pengguna",
+    });
   }
 };
 
@@ -215,6 +217,24 @@ export const logoutUser = (req, res) => {
       success: true,
       message: "Logout telah berhasil",
     });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Pengguna berhasil dihapus" });
   } catch (error) {
     res
       .status(500)

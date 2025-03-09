@@ -8,14 +8,14 @@ export const uploadAvatar = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
     }
 
     // Validasi apakah ada file yang diunggah
     if (!req.files || req.files.length === 0) {
       return res
         .status(400)
-        .json({ success: false, message: "No files uploaded" });
+        .json({ success: false, message: "Tidak ada file yang diunggah" });
     }
 
     // Map file untuk mendapatkan URL dan ID dari Cloudinary dengan nama asli
@@ -41,13 +41,13 @@ export const uploadAvatar = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Avatar uploaded successfully",
+      message: "Avatar berhasil diunggah",
       data: { avatar: user.avatar }, // Kirim kembali avatar URL
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to upload avatar",
+      message: "Gagal mengunggah avatar",
       error: error.message,
     });
   }
@@ -60,18 +60,18 @@ export const getAvatar = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
     }
 
     res.status(200).json({
       success: true,
-      message: "Avatar retrieved successfully",
+      message: "Avatar berhasil diambil",
       data: { avatar: user.avatar }, // Kirim kembali avatar URL
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve avatar",
+      message: "Gagal mengambil avatar",
       error: error.message,
     });
   }
@@ -84,14 +84,14 @@ export const updateAvatar = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
     }
 
     // Validasi apakah ada file yang diunggah
     if (!req.files || req.files.length === 0) {
       return res
         .status(400)
-        .json({ success: false, message: "No files uploaded" });
+        .json({ success: false, message: "Tidak ada file yang diunggah" });
     }
 
     // Jika user sudah memiliki avatar sebelumnya, hapus dari Cloudinary
@@ -117,13 +117,13 @@ export const updateAvatar = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Avatar updated successfully",
+      message: "Avatar berhasil diperbarui",
       data: { avatar: user.avatar }, // Kirim kembali avatar URL
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to update avatar",
+      message: "Gagal memperbarui avatar",
       error: error.message,
     });
   }

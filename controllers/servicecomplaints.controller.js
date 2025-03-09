@@ -61,3 +61,16 @@ export const getAllServicecomplaints = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const deleteServicecomplaints = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Servicecomplaints.findByIdAndDelete(id);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Pengaduan berhasil dihapus" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
