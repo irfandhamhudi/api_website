@@ -6,6 +6,7 @@ const servicecomplaintsSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   images: [{ type: String, required: true }],
   msg: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Servicecomplaints = mongoose.model(
