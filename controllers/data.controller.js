@@ -8,6 +8,11 @@ const validateDate = (date) => {
   return regex.test(date);
 };
 
+const validateTime = (time) => {
+  const regex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+  return regex.test(time);
+};
+
 // Fungsi untuk membuat data baru
 export const createData = async (req, res) => {
   try {
@@ -18,7 +23,7 @@ export const createData = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "All fields (title, description, date, time, bidang) are required.",
+          "Semua field (title, description, date, time, bidang) wajib diisi.",
       });
     }
 
@@ -26,7 +31,15 @@ export const createData = async (req, res) => {
     if (!validateDate(date)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid date format. Use dd/mm/yyyy.",
+        message: "Format tanggal tidak valid. Gunakan dd/mm/yyyy.",
+      });
+    }
+
+    // Validasi format waktu
+    if (!validateTime(time)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format waktu tidak valid. Gunakan HH:MM.",
       });
     }
 
@@ -35,7 +48,7 @@ export const createData = async (req, res) => {
     if (!bidangExists) {
       return res.status(400).json({
         success: false,
-        message: "Invalid bidang. Bidang not found.",
+        message: "Invalid bidang. Bidang tidak ditemukan.",
       });
     }
 
@@ -69,7 +82,11 @@ export const createData = async (req, res) => {
     const savedData = await newData.save();
 
     // Kirim respons sukses
-    res.status(201).json({ success: true, data: savedData });
+    res.status(201).json({
+      success: true,
+      data: savedData,
+      message: "Berhasil menambahkan data",
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -80,7 +97,131 @@ export const getAllData = async (req, res) => {
   try {
     // Ambil semua data dari database, termasuk populate bidang
     const data = await Data.find().populate("bidang", "name"); // Populate bidang dengan field "name"
-    res.status(200).json({ success: true, data });
+    res
+      .status(200)
+      .json({ success: true, data, message: "Berhasil mendapatkan data" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Fungsi untuk mengedit data berdasarkan ID
+export const updateData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, date, time, bidang } = req.body;
+
+    // Cari data yang akan diupdate
+    const existingData = await Data.findById(id);
+    if (!existingData) {
+      return res.status(404).json({
+        success: false,
+        message: "Data tidak ditemukan.",
+      });
+    }
+
+    // Validasi format tanggal jika ada perubahan
+    if (date && !validateDate(date)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format tanggal tidak valid. Gunakan dd/mm/yyyy.",
+      });
+    }
+
+    // Validasi format waktu jika ada perubahan
+    if (time && !validateTime(time)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format waktu tidak valid. Gunakan HH:MM.",
+      });
+    }
+
+    // Validasi bidang jika ada perubahan
+    if (bidang) {
+      const bidangExists = await Bidang.findById(bidang);
+      if (!bidangExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid bidang. Bidang tidak ditemukan.",
+        });
+      }
+    }
+
+    // Upload gambar baru ke Cloudinary jika ada file yang diunggah
+    let imageUrls = existingData.images; // Gunakan gambar yang sudah ada sebagai default
+    if (req.files && req.files.length > 0) {
+      imageUrls = await Promise.all(
+        req.files.map(async (file) => {
+          const uploaded = await cloudinary.uploader.upload(file.path, {
+            folder: "kel.tlogosari/datanews",
+            public_id: file.originalname.split(".")[0],
+            resource_type: "image",
+            overwrite: true,
+          });
+          return uploaded.secure_url; // Simpan URL gambar baru
+        })
+      );
+    }
+
+    // Update data
+    const updatedData = await Data.findByIdAndUpdate(
+      id,
+      {
+        title: title || existingData.title,
+        description: description || existingData.description,
+        images: imageUrls, // Gunakan gambar baru atau yang sudah ada
+        date: date || existingData.date,
+        time: time || existingData.time,
+        bidang: bidang || existingData.bidang,
+      },
+      { new: true } // Mengembalikan data yang sudah diupdate
+    ).populate("bidang", "name");
+
+    // Kirim respons sukses
+    res.status(200).json({
+      success: true,
+      data: updatedData,
+      message: "Berhasil memperbarui data.",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Fungsi untuk menghapus data berdasarkan ID
+export const deleteData = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Cari data yang akan dihapus
+    const existingData = await Data.findById(id);
+    if (!existingData) {
+      return res.status(404).json({
+        success: false,
+        message: "Data tidak ditemukan.",
+      });
+    }
+
+    // Hapus gambar dari Cloudinary jika ada
+    if (existingData.images && existingData.images.length > 0) {
+      await Promise.all(
+        existingData.images.map(async (imageUrl) => {
+          const publicId = imageUrl.split("/").pop().split(".")[0]; // Ekstrak public_id dari URL
+          await cloudinary.uploader.destroy(
+            `kel.tlogosari/datanews/${publicId}`
+          );
+        })
+      );
+    }
+
+    // Hapus data dari database
+    await Data.findByIdAndDelete(id);
+
+    // Kirim respons sukses
+    res.status(200).json({
+      success: true,
+      message: "Berhasil menghapus data.",
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

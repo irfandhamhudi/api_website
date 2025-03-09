@@ -27,14 +27,14 @@ export const uploadSlider = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Slider uploaded successfully",
+      message: "Slider berhasil diupload",
       data: newSlider,
     });
   } catch (error) {
-    console.error("Error uploading slider:", error);
+    console.error("Slider upload error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to upload slider",
+      message: "Slider gagal diupload",
       error: error.message,
     });
   }
@@ -74,7 +74,7 @@ export const editSlider = async (req, res) => {
     if (!slider) {
       return res.status(404).json({
         success: false,
-        message: "Slider not found",
+        message: "Slider tidak ditemukan",
       });
     }
 
@@ -84,14 +84,14 @@ export const editSlider = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Slider updated successfully",
+      message: "Slider berhasil diperbarui",
       data: slider,
     });
   } catch (error) {
-    console.error("Error updating slider:", error);
+    console.error("Slider update error:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to update slider",
+      message: "Slider gagal diperbarui",
       error: error.message,
     });
   }
@@ -101,7 +101,17 @@ export const deleteSlider = async (req, res) => {
   try {
     const { id } = req.params;
     await Slider.findByIdAndDelete(id);
-    res.status(200).json({ success: true, message: "Slider deleted" });
+    res.status(200).json({ success: true, message: "Slider berhasil dihapus" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSliderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const slider = await Slider.findById(id).populate("images", "url");
+    res.status(200).json({ success: true, data: slider });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
