@@ -5,12 +5,12 @@ export const createServicecomplaints = async (req, res) => {
   try {
     const { name, email, phone, msg } = req.body;
 
-    // if (!name || !email || !phone || !msg) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Semua field (name, email, phone, msg) wajib diisi.",
-    //   });
-    // }
+    if (!name || !email || !phone || !msg) {
+      return res.status(400).json({
+        success: false,
+        message: "Semua field (name, email, phone, msg) wajib diisi.",
+      });
+    }
 
     // Upload gambar ke Cloudinary jika ada file yang diunggah
     let imageUrls = [];
