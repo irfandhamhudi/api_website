@@ -7,33 +7,22 @@ import {
 } from "../controllers/slider.controller.js";
 import upload from "../middleware/upload.middleware.js";
 import express from "express";
-import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 // Upload slider
-router.post(
-  "/create",
-  upload.array("images", 10),
-  authMiddleware,
-  uploadSlider
-);
+router.post("/create", upload.array("images", 10), uploadSlider);
 
 // Get all slider
-router.get("/all", authMiddleware, getAllSlider);
+router.get("/all", getAllSlider);
 
 // Get slider by ID
-router.get("/get/:id", authMiddleware, getSliderById);
+router.get("/get/:id", getSliderById);
 
 // Edit slider
-router.patch(
-  "/edit/:id",
-  upload.array("images", 10),
-  authMiddleware,
-  editSlider
-);
+router.patch("/edit/:id", upload.array("images", 10), editSlider);
 
 // Delete slider
-router.delete("/delete/:id", authMiddleware, deleteSlider);
+router.delete("/delete/:id", deleteSlider);
 
 export default router;

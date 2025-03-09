@@ -7,29 +7,23 @@ import {
   updateData,
   deleteData,
 } from "../controllers/data.controller.js";
-import authMiddleware from "../middleware/auth.middleware.js";
 import upload from "../middleware/upload.middleware.js";
 import express from "express";
 
 const router = express.Router();
 
-router.post("/create", upload.array("images", 10), authMiddleware, createData);
+router.post("/create", upload.array("images", 10), createData);
 
 router.get("/all", getAllData);
 
-router.patch(
-  "/edit/:id",
-  upload.array("images", 10),
-  authMiddleware,
-  updateData
-);
+router.patch("/edit/:id", upload.array("images", 10), updateData);
 
-router.delete("/delete/:id", authMiddleware, deleteData);
+router.delete("/delete/:id", deleteData);
 
-router.get("/bidang/:bidang", authMiddleware, getDataByBidang);
+router.get("/bidang/:bidang", getDataByBidang);
 
-router.get("/:title", authMiddleware, getDataByTitle);
+router.get("/:title", getDataByTitle);
 
-router.get("/get/:id", authMiddleware, getDataById);
+router.get("/get/:id", getDataById);
 
 export default router;
