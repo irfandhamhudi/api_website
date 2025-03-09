@@ -10,6 +10,7 @@ import avatarRoutes from "./routes/avatar.route.js";
 import dataRoutes from "./routes/data.route.js";
 import bidangRoutes from "./routes/bidang.route.js";
 import sliderRoutes from "./routes/slider.route.js";
+import servicecomplaintRoutes from "./routes/servicecomplaint.route.js";
 
 dotenv.config();
 connectDB();
@@ -51,6 +52,9 @@ app.use("/api/v1/bidang", bidangRoutes);
 
 // Route for slider
 app.use("/api/v1/slider", sliderRoutes);
+
+// Route for servicecomplaint
+app.use("/api/v1/servicecomplaint", servicecomplaintRoutes);
 
 const PORT = process.env.PORT || 5000;
 
