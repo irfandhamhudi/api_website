@@ -76,6 +76,16 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
+// Get All Users
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({ success: true, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch users." });
+  }
+};
+
 // Resend OTP
 export const resendOtp = async (req, res) => {
   const { email } = req.body;
