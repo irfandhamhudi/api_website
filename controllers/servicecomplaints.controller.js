@@ -50,3 +50,14 @@ export const createServicecomplaints = async (req, res) => {
       .json({ success: false, message: "Gagal mengirim pengaduan" });
   }
 };
+
+export const getAllServicecomplaints = async (req, res) => {
+  try {
+    const servicecomplaints = await Servicecomplaints.find().sort({
+      createdAt: -1,
+    });
+    res.status(200).json({ success: true, data: servicecomplaints });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

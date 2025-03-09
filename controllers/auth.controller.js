@@ -190,3 +190,24 @@ export const getMe = async (req, res) => {
       .json({ success: false, message: "Failed to retrieve user data" });
   }
 };
+
+// Logout
+export const logoutUser = (req, res) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0, // Hapus cookie
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logout telah berhasil",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};

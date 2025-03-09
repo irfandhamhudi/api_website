@@ -6,6 +6,7 @@ import {
   resendOtp,
   loginUser,
   getMe,
+  logoutUser,
 } from "../controllers/auth.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 const router = express.Router();
@@ -25,4 +26,6 @@ router.post("/login", loginUser);
 // Get Me
 router.get("/me", authMiddleware, getMe);
 
+// Logout User
+router.post("/logout", authMiddleware, logoutUser);
 export default router;
