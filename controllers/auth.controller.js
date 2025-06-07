@@ -206,23 +206,26 @@ export const getMe = async (req, res) => {
 };
 
 // Logout
-export const logoutUser = (req, res) => {
+export const logoutUser = async (req, res) => {
   try {
-    res.cookie("jwt", {
+    res.clearCookie("jwt", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      secure: true, // Selalu true di produksi untuk HTTPS
+      sameSite: "none", // Diperlukan untuk lintas situs
       maxAge: 0, // Hapus cookie
     });
 
     res.status(200).json({
       success: true,
-      message: "Logout telah berhasil",
+      message: "Logout successful",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to logout",
+      error: error.message,
+    });
   }
 };
 
