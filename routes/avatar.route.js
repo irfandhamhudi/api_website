@@ -4,23 +4,18 @@ import {
   getAvatar,
   updateAvatar,
 } from "../controllers/avatar.controller.js";
-import upload from "../middleware/upload.middleware.js";
+import upload from "../middleware/upload.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 // Upload images
-router.post("/upload", authMiddleware, upload.array("images", 1), uploadAvatar); // Maksimal 10 gambar
+router.post("/upload", authMiddleware, upload, uploadAvatar); // Maksimal 10 gambar
 
 // Get avatar
 router.get("/get", authMiddleware, getAvatar);
 
 // Update avatar
-router.patch(
-  "/update",
-  authMiddleware,
-  upload.array("images", 1),
-  updateAvatar
-);
+router.patch("/update", authMiddleware, upload, updateAvatar);
 
 export default router;
