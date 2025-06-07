@@ -8,8 +8,10 @@ import {
   getMe,
   logoutUser,
   getAllUsers,
+  updateUser,
 } from "../controllers/auth.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
+import upload from "../middleware/upload.js";
 const router = express.Router();
 
 // Register User
@@ -32,4 +34,7 @@ router.get("/me", authMiddleware, getMe);
 
 // Logout User
 router.post("/logout", authMiddleware, logoutUser);
+
+// Update User
+router.put("/update", authMiddleware, upload, updateUser);
 export default router;

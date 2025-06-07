@@ -3,6 +3,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import sendEmail from "../utils/send.email.js";
 import jwt from "jsonwebtoken";
+import cloudinary from "../config/cloudinary.js";
 
 // Register User
 export const registerUser = async (req, res) => {
@@ -168,14 +169,15 @@ export const loginUser = async (req, res) => {
     // Simpan token di cookie
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
-      maxAge: 1000 * 60 * 60 * 24 * 5, //5 days
+      secure: process.env.NODE_ENV === "development",
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24 * 5, // 5 days
     });
 
     res.status(200).json({
       success: true,
       message: "Login berhasil",
+      token,
     });
   } catch (error) {
     res
@@ -206,10 +208,10 @@ export const getMe = async (req, res) => {
 // Logout
 export const logoutUser = (req, res) => {
   try {
-    res.cookie("jwt", "", {
+    res.cookie("jwt", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "development",
+      sameSite: "none",
       maxAge: 0, // Hapus cookie
     });
 
@@ -224,6 +226,7 @@ export const logoutUser = (req, res) => {
   }
 };
 
+// Delete User
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.user.id);
@@ -239,5 +242,86 @@ export const deleteUser = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+// Update User
+export const updateUser = async (req, res) => {
+  try {
+    const { username, firstname, lastname } = req.body;
+    const avatar = req.file;
+
+    // Find user by ID from JWT
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Pengguna tidak ditemukan" });
+    }
+
+    // Validate input
+    if (!username) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username harus diisi" });
+    }
+
+    // Check if username is already taken by another user
+    const existingUser = await User.findOne({
+      username,
+      _id: { $ne: user._id },
+    });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Username sudah digunakan" });
+    }
+
+    // Update user fields
+    user.username = username || user.username;
+    user.firstname = firstname || user.firstname;
+    user.lastname = lastname || user.lastname;
+
+    // Handle avatar upload
+    if (avatar) {
+      // If user has an existing avatar, delete it from Cloudinary
+      if (user.avatarId) {
+        await cloudinary.uploader.destroy(user.avatarId, {
+          resource_type: "image",
+        });
+      }
+
+      // Upload new avatar to Cloudinary
+      const uploaded = await cloudinary.uploader.upload(avatar.path, {
+        folder: "kel.tlogosari/avatar",
+        public_id: avatar.originalname.split(".")[0],
+        overwrite: true,
+        resource_type: "image",
+      });
+
+      // Update avatar URL and ID
+      user.avatar = uploaded.secure_url;
+      user.avatarId = uploaded.public_id;
+    }
+
+    // Save updated user
+    await user.save();
+
+    // Remove password from response
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.status(200).json({
+      success: true,
+      message: "Profil berhasil diperbarui",
+      data: userData,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Gagal memperbarui profil",
+      error: error.message,
+    });
   }
 };
