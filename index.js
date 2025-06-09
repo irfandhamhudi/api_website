@@ -31,7 +31,7 @@ const startServer = async () => {
       "http://localhost:5173",
       "http://192.168.1.5:3001",
       "http://localhost:3001",
-      "https://rebranding-web-kel-tlogosari-wetan-lyart.vercel.app/login",
+      "https://rebranding-web-kel-tlogosari-wetan-lyart.vercel.app",
       "https://rebranding-web-kel-tlogosari-wetan.vercel.app",
     ];
 
