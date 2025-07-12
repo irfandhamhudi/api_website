@@ -133,12 +133,12 @@ export const respondToServiceComplaint = async (req, res) => {
     const { responderName, responseText } = req.body;
 
     // Validate input
-    if (!responderName || !responseText) {
-      return res.status(400).json({
-        success: false,
-        message: "Semua field (responderName, responseText) wajib diisi.",
-      });
-    }
+    // if (!responderName || !responseText) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Semua field (responderName, responseText) wajib diisi.",
+    //   });
+    // }
 
     // Validate responderName
     const validateName = (name) => {

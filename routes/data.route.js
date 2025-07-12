@@ -1,11 +1,13 @@
 import {
   createData,
   getAllData,
-  getDataByTitle,
+  // getDataByTitle,
+  getLatestData,
   getDataByBidang,
   getDataById,
   updateData,
   deleteData,
+  getDataBySlug,
 } from "../controllers/data.controller.js";
 import upload from "../middleware/upload.middleware.js";
 import express from "express";
@@ -22,8 +24,10 @@ router.delete("/delete/:id", deleteData);
 
 router.get("/bidang/:bidang", getDataByBidang);
 
-router.get("/:title", getDataByTitle);
+router.get("/slug/:slug", getDataBySlug);
 
 router.get("/get/:id", getDataById);
+
+router.get("/latest", getLatestData);
 
 export default router;
