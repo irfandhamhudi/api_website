@@ -12,6 +12,7 @@ import avatarRoutes from "./routes/avatar.route.js";
 import dataRoutes from "./routes/data.route.js";
 import bidangRoutes from "./routes/bidang.route.js";
 import sliderRoutes from "./routes/slider.route.js";
+import galeriRoutes from "./routes/galeri.route.js";
 import servicecomplaintRoutes from "./routes/servicecomplaint.route.js";
 
 const startServer = async () => {
@@ -55,6 +56,7 @@ const startServer = async () => {
     app.use("/api/v1/bidang", bidangRoutes);
     app.use("/api/v1/slider", sliderRoutes);
     app.use("/api/v1/servicecomplaint", servicecomplaintRoutes);
+    app.use("/api/v1/galeri", galeriRoutes);
 
     const PORT = process.env.PORT || 5000;
 
