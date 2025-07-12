@@ -15,8 +15,8 @@ export const createBidang = async (req, res) => {
 
 export const getAllBidang = async (req, res) => {
   try {
-    const data = await Bidang.find();
-    return res.status(200).json({ success: true, data });
+    const bidang = await Bidang.find();
+    return res.status(200).json({ success: true, bidang });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
